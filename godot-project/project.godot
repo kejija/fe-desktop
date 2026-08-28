@@ -1,0 +1,30 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Future Engine Desktop"
+config/description="Stock Godot editor addon for Future Engine System Design"
+config/features=PackedStringArray("4.7")
+config/icon="res://assets/branding/future_engine.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/future_engine/plugin.cfg")
+
+[future_engine]
+
+gateway_url="http://127.0.0.1:8142"
+request_timeout_seconds=15.0
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "draft_revision_conflict",
+    "message": "The draft changed after it was loaded.",
+    "request_id": "mock-conflict",
+    "retryable": false,
+    "details": { "current_revision": 4 }
+  }
+}

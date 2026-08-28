@@ -1,0 +1,105 @@
+{
+  "schema_version": "future-engine.system-design-presentation.v1",
+  "design_id": "demo-drive",
+  "draft_revision_number": 3,
+  "profile_id": "default",
+  "design_hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "coordinate_system": { "handedness": "right", "up_axis": "z", "length_unit": "m", "angle_unit": "rad", "quaternion_order": "wxyz" },
+  "instances": [
+    {
+      "instance_id": "controller", "name": "Motion controller",
+      "world_transform": { "translation_m": [-0.18, 0, 0.10], "rotation_wxyz": [1, 0, 0, 0] },
+      "release": { "release_id": "release-controller-2", "item_key": "component/motion-controller", "kind": "component", "version": "2.4.0", "package_digest": "sha256:1010101010101010101010101010101010101010101010101010101010101010", "category": "Control", "description": "48 V motion controller with power and feedback interfaces.", "readiness_status": "warning" },
+      "model": { "asset_path": "/v1/blobs/mock-empty.glb", "sha256": "sha256:49b5bb552a20da2db4682aeb3e585fa7a5f1524be978f0434a9496b2a4b5d796", "size_bytes": 136, "scale_to_m": 1, "model_scale": [1, 1, 1], "inner_rotation_wxyz": [1, 0, 0, 0], "materials": [] },
+      "editability": { "editable": true, "reason": "anchor" },
+      "interfaces": [
+        { "interface_id": "supply-in", "name": "DC supply", "description": "Incoming DC bus", "type": "port", "domain": "electrical", "direction": "input", "compatibility_key": "dc-48v", "capacity": { "used": 0, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": true, "state": "available", "state_message": "Ready for a 48 V source" },
+        { "interface_id": "motor-power", "name": "Motor power", "description": "Three-phase motor drive", "type": "port", "domain": "electrical", "direction": "output", "compatibility_key": "bldc-3phase", "capacity": { "used": 1, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": false, "state": "capacity_reached", "state_message": "Connected to BLDC motor" },
+        { "interface_id": "feedback-in", "name": "Position feedback", "description": "Absolute position input", "type": "port", "domain": "signal", "direction": "input", "compatibility_key": "ssi-position", "capacity": { "used": 1, "maximum": 2 }, "readiness": { "status": "draft", "diagnostics": ["Timing budget is awaiting review"] }, "connectable": true, "state": "connected", "state_message": "Connected; one channel remains" }
+      ],
+      "resolved_configuration": { "preset": "servo", "parameters": [{ "id": "bus_voltage", "name": "Bus voltage", "value": 48, "unit": "V", "description": "Nominal motor bus voltage" }, { "id": "control_rate", "name": "Control rate", "value": 10, "unit": "kHz", "description": "Closed-loop controller update rate" }] }
+    },
+    {
+      "instance_id": "motor", "name": "BLDC motor",
+      "world_transform": { "translation_m": [0, 0, 0.08], "rotation_wxyz": [1, 0, 0, 0] },
+      "release": { "release_id": "release-bldc-3", "item_key": "component/bldc-motor", "kind": "component", "version": "3.1.0", "package_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111", "category": "Actuator", "description": "Compact 400 W brushless servo motor.", "readiness_status": "ready" },
+      "model": { "asset_path": "/v1/blobs/mock-empty.glb", "sha256": "sha256:49b5bb552a20da2db4682aeb3e585fa7a5f1524be978f0434a9496b2a4b5d796", "size_bytes": 136, "scale_to_m": 1, "model_scale": [1, 1, 1], "inner_rotation_wxyz": [1, 0, 0, 0], "materials": [] },
+      "editability": { "editable": true, "reason": "anchor" },
+      "interfaces": [
+        { "interface_id": "power-in", "name": "Phase power", "description": "Three-phase input", "type": "port", "domain": "electrical", "direction": "input", "compatibility_key": "bldc-3phase", "capacity": { "used": 1, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": false, "state": "capacity_reached", "state_message": "Driven by motion controller" },
+        { "interface_id": "shaft-output", "name": "Shaft output", "description": "Primary torque output", "type": "mount", "domain": "mechanical", "direction": "output", "compatibility_key": "shaft-12mm", "capacity": { "used": 1, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": false, "state": "capacity_reached", "state_message": "Resolved by revolute joint" },
+        { "interface_id": "front-bearing", "name": "Front bearing", "description": "Bearing alignment mount", "type": "mount", "domain": "mechanical", "direction": "bidirectional", "compatibility_key": "bearing-6001", "capacity": { "used": 1, "maximum": 2 }, "readiness": { "status": "draft", "diagnostics": ["Fit tolerance awaiting resolver refresh"] }, "connectable": true, "state": "connected", "state_message": "Connected; preview is stale" },
+        { "interface_id": "frame-mount", "name": "Frame mount", "description": "Motor flange", "type": "mount", "domain": "mechanical", "direction": "bidirectional", "compatibility_key": "flange-42", "capacity": { "used": 1, "maximum": 4 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": true, "state": "connected", "state_message": "Mounted to base plate" },
+        { "interface_id": "accessory-in", "name": "Accessory input", "description": "Available 12 mm commissioning coupler", "type": "mount", "domain": "mechanical", "direction": "input", "compatibility_key": "shaft-12mm", "capacity": { "used": 0, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": true, "state": "available", "state_message": "Available for exact-port preview" }
+      ],
+      "resolved_configuration": { "preset": "high-torque", "parameters": [{ "id": "rated_power", "name": "Rated power", "value": 400, "unit": "W", "description": "Continuous rated output" }, { "id": "torque_constant", "name": "Torque constant", "value": 0.32, "unit": "N·m/A", "description": "Resolved winding constant" }] }
+    },
+    {
+      "instance_id": "shaft", "name": "Output shaft",
+      "world_transform": { "translation_m": [0, 0, 0.22], "rotation_wxyz": [1, 0, 0, 0] },
+      "release": { "release_id": "release-shaft-1", "item_key": "component/round-shaft", "kind": "component", "version": "1.2.0", "package_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222", "category": "Transmission", "description": "12 mm keyed output shaft.", "readiness_status": "warning" },
+      "model": { "asset_path": "/v1/blobs/mock-empty.glb", "sha256": "sha256:49b5bb552a20da2db4682aeb3e585fa7a5f1524be978f0434a9496b2a4b5d796", "size_bytes": 136, "scale_to_m": 0.001, "model_scale": [1, 1, 1], "inner_rotation_wxyz": [0, 1, 0, 0], "materials": [] },
+      "editability": { "editable": false, "reason": "joint_derived" },
+      "interfaces": [
+        { "interface_id": "drive-input", "name": "Drive input", "description": "Motor shaft receiver", "type": "mount", "domain": "mechanical", "direction": "input", "compatibility_key": "shaft-12mm", "capacity": { "used": 1, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": false, "state": "capacity_reached", "state_message": "Position is joint-derived" },
+        { "interface_id": "bearing-seat", "name": "Bearing seat", "description": "6001 bearing seat", "type": "mount", "domain": "mechanical", "direction": "bidirectional", "compatibility_key": "bearing-6001", "capacity": { "used": 1, "maximum": 1 }, "readiness": { "status": "draft", "diagnostics": ["Tolerance evidence is stale"] }, "connectable": false, "state": "capacity_reached", "state_message": "Capacity reached" },
+        { "interface_id": "tool-output", "name": "Tool output", "description": "Free mechanical output", "type": "mount", "domain": "mechanical", "direction": "output", "compatibility_key": "shaft-12mm", "capacity": { "used": 0, "maximum": 1 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": true, "state": "available", "state_message": "Available for connection" }
+      ],
+      "resolved_configuration": { "preset": "12mm", "parameters": [{ "id": "length", "name": "Length", "value": 140, "unit": "mm", "description": "Overall shaft length" }] }
+    },
+    {
+      "instance_id": "encoder", "name": "Absolute encoder",
+      "world_transform": { "translation_m": [0.07, 0, 0.08], "rotation_wxyz": [1, 0, 0, 0] },
+      "release": { "release_id": "release-encoder-5", "item_key": "component/absolute-encoder", "kind": "component", "version": "5.0.1", "package_digest": "sha256:3030303030303030303030303030303030303030303030303030303030303030", "category": "Sensor", "description": "Single-turn absolute position sensor.", "readiness_status": "blocked" },
+      "model": { "asset_path": "/v1/blobs/mock-empty.glb", "sha256": "sha256:49b5bb552a20da2db4682aeb3e585fa7a5f1524be978f0434a9496b2a4b5d796", "size_bytes": 136, "scale_to_m": 1, "model_scale": [1, 1, 1], "inner_rotation_wxyz": [1, 0, 0, 0], "materials": [] },
+      "editability": { "editable": true, "reason": "anchor" },
+      "interfaces": [
+        { "interface_id": "position-out", "name": "Position", "description": "SSI absolute position", "type": "port", "domain": "signal", "direction": "output", "compatibility_key": "ssi-position", "capacity": { "used": 1, "maximum": 1 }, "readiness": { "status": "draft", "diagnostics": ["Timing evidence incomplete"] }, "connectable": false, "state": "capacity_reached", "state_message": "Connected to controller" },
+        { "interface_id": "power-in", "name": "Sensor power", "description": "5 V sensor supply", "type": "port", "domain": "electrical", "direction": "input", "compatibility_key": "dc-5v", "capacity": { "used": 0, "maximum": 1 }, "readiness": { "status": "incomplete", "diagnostics": ["Voltage range not declared"] }, "connectable": false, "state": "definition_incomplete", "state_message": "Complete the interface definition" }
+      ],
+      "resolved_configuration": { "preset": "single-turn", "parameters": [{ "id": "resolution", "name": "Resolution", "value": 18, "unit": "bit", "description": "Absolute angular resolution" }] }
+    },
+    {
+      "instance_id": "plate", "name": "Base plate",
+      "world_transform": { "translation_m": [0, 0, 0], "rotation_wxyz": [1, 0, 0, 0] },
+      "release": { "release_id": "release-plate-1", "item_key": "component/base-plate", "kind": "component", "version": "1.0.0", "package_digest": "sha256:4040404040404040404040404040404040404040404040404040404040404040", "category": "Structure", "description": "Locked workstation base plate.", "readiness_status": "ready" },
+      "model": { "asset_path": "/v1/blobs/mock-empty.glb", "sha256": "sha256:49b5bb552a20da2db4682aeb3e585fa7a5f1524be978f0434a9496b2a4b5d796", "size_bytes": 136, "scale_to_m": 1, "model_scale": [1, 1, 1], "inner_rotation_wxyz": [1, 0, 0, 0], "materials": [] },
+      "editability": { "editable": false, "reason": "assembly_locked" },
+      "interfaces": [
+        { "interface_id": "drive-mount", "name": "Drive mount", "description": "Drive module mounting pattern", "type": "mount", "domain": "mechanical", "direction": "bidirectional", "compatibility_key": "flange-42", "capacity": { "used": 1, "maximum": 4 }, "readiness": { "status": "reviewed", "diagnostics": [] }, "connectable": false, "state": "connected", "state_message": "Assembly is locked" }
+      ],
+      "resolved_configuration": { "preset": "compact", "parameters": [{ "id": "material", "name": "Material", "value": "6061-T6", "unit": null, "description": "Released plate material" }] }
+    },
+    {
+      "instance_id": "bolt-1", "name": "Generated M4 fastener",
+      "world_transform": { "translation_m": [0.03, 0.02, 0.01], "rotation_wxyz": [1, 0, 0, 0] },
+      "release": { "release_id": "release-fastener-1", "item_key": "component/fastener-m4", "kind": "component", "version": "1.0.0", "package_digest": "sha256:5050505050505050505050505050505050505050505050505050505050505050", "category": "Generated hardware", "description": "Resolver-owned mounting fastener.", "readiness_status": "ready" },
+      "model": { "asset_path": "/v1/blobs/mock-empty.glb", "sha256": "sha256:49b5bb552a20da2db4682aeb3e585fa7a5f1524be978f0434a9496b2a4b5d796", "size_bytes": 136, "scale_to_m": 1, "model_scale": [1, 1, 1], "inner_rotation_wxyz": [1, 0, 0, 0], "materials": [] },
+      "editability": { "editable": false, "reason": "generated" },
+      "interfaces": [],
+      "resolved_configuration": { "preset": "default", "parameters": [] }
+    }
+  ],
+  "relationships": [
+    { "relationship_id": "power-link", "kind": "connection", "source": { "instance_id": "controller", "interface_id": "motor-power" }, "target": { "instance_id": "motor", "interface_id": "power-in" }, "connection_type": "electrical", "label": "Motor power", "description": "48 V three-phase power", "status": "compatible", "resolver_status": "resolved" },
+    { "relationship_id": "signal-link", "kind": "connection", "source": { "instance_id": "encoder", "interface_id": "position-out" }, "target": { "instance_id": "controller", "interface_id": "feedback-in" }, "connection_type": "signal", "label": "Position feedback", "description": "SSI feedback bus", "status": "warning", "resolver_status": "resolved" },
+    { "relationship_id": "motor-shaft", "kind": "connection", "source": { "instance_id": "motor", "interface_id": "shaft-output" }, "target": { "instance_id": "shaft", "interface_id": "drive-input" }, "connection_type": "mechanical", "label": "Torque coupling", "description": "Resolved shaft coupling", "status": "compatible", "resolver_status": "resolved" },
+    { "relationship_id": "bearing-fit", "kind": "connection", "source": { "instance_id": "motor", "interface_id": "front-bearing" }, "target": { "instance_id": "shaft", "interface_id": "bearing-seat" }, "connection_type": "mechanical", "label": "Bearing fit", "description": "Bearing alignment relationship", "status": "warning", "resolver_status": "stale" },
+    { "relationship_id": "plate-mount", "kind": "connection", "source": { "instance_id": "motor", "interface_id": "frame-mount" }, "target": { "instance_id": "plate", "interface_id": "drive-mount" }, "connection_type": "mechanical", "label": "Frame mount", "description": "Resolved flange mount with generated hardware", "status": "compatible", "resolver_status": "resolved" },
+    { "relationship_id": "shaft-joint", "kind": "joint", "source": { "instance_id": "motor", "interface_id": "shaft-output" }, "target": { "instance_id": "shaft", "interface_id": "drive-input" }, "connection_type": "mechanical", "label": "Revolute joint", "description": "Motor shaft kinematic joint", "status": "compatible", "resolver_status": "resolved" },
+    { "relationship_id": "body-constraint", "kind": "joint", "source": { "instance_id": "motor", "interface_id": null }, "target": { "instance_id": "shaft", "interface_id": null }, "connection_type": "mechanical", "label": "Body constraint", "description": "Body-authored fixed constraint", "status": "unverified", "resolver_status": "unresolved" }
+  ],
+  "bom": [
+    { "item_key": "component/motion-controller", "version": "2.4.0", "quantity": 1 },
+    { "item_key": "component/bldc-motor", "version": "3.1.0", "quantity": 1 },
+    { "item_key": "component/round-shaft", "version": "1.2.0", "quantity": 1 },
+    { "item_key": "component/absolute-encoder", "version": "5.0.1", "quantity": 1 },
+    { "item_key": "component/base-plate", "version": "1.0.0", "quantity": 1 }
+  ],
+  "readiness": { "status": "warning", "summary": "Mechanical stack is usable; encoder power definition blocks full readiness." },
+  "diagnostics": [
+    { "severity": "warning", "code": "MOCK-001", "message": "This design is served by the deterministic mock backend.", "instance_id": null },
+    { "severity": "error", "code": "PORT-INCOMPLETE", "message": "Encoder sensor power voltage range is incomplete.", "instance_id": "encoder" },
+    { "severity": "warning", "code": "PREVIEW-STALE", "message": "Bearing fit preview must be refreshed before editing.", "instance_id": "shaft" }
+  ]
+}

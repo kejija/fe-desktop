@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": "presentation_invalid",
+    "message": "The selected profile contains an invalid formula.",
+    "request_id": "mock-validation",
+    "retryable": false,
+    "details": {
+      "diagnostics": [
+        { "severity": "error", "code": "FORMULA-001", "message": "Formula cannot divide by zero.", "instance_id": "shaft" }
+      ]
+    }
+  }
+}

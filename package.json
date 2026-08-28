@@ -1,0 +1,22 @@
+{
+  "name": "@future-engine/fe-desktop",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "gateway": "node tools/frontend-gateway/src/index.mjs",
+    "gateway:mock": "FE_BACKEND_MODE=mock node tools/frontend-gateway/src/index.mjs",
+    "test": "node --test tools/frontend-gateway/test/*.test.mjs && node tools/validate-contracts.mjs && node tools/verify-repository.mjs",
+    "test:contracts": "node tools/validate-contracts.mjs",
+    "test:repository": "node tools/verify-repository.mjs",
+    "test:web": "playwright test",
+    "stage:web-editor": "node tools/stage-web-editor.mjs",
+    "package:addon": "python3 tools/package-addon.py"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
+  }
+}

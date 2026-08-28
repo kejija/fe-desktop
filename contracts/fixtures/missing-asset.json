@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "component_asset_unavailable",
+    "message": "A pinned component asset is temporarily unavailable.",
+    "request_id": "mock-missing-asset",
+    "retryable": true
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@future-engine/desktop-gateway",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" }
+}

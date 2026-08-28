@@ -1,0 +1,11 @@
+{
+  "schema_version": "future-engine.desktop-frontends.v1",
+  "modules": [
+    {
+      "id": "system_design",
+      "display_name": "System Design",
+      "script": "res://addons/future_engine/modules/system_design/system_design_module.gd",
+      "required_services": ["node-design", "components", "simulation"]
+    }
+  ]
+}

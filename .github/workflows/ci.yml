@@ -1,0 +1,75 @@
+name: Stock Godot addon
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts-gateway-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run stage:web-editor
+      - run: npm run test:web
+      - run: npm run package:addon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: future-engine-desktop-addon
+          path: dist/future-engine-desktop-addon-*.zip
+
+  godot-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node tools/download-godot.mjs linux-x86_64
+      - run: python3 -m zipfile -e downloads/linux-x86_64/Godot_v4.7.2-stable_linux.x86_64.zip downloads/linux-x86_64/editor
+      - run: chmod +x downloads/linux-x86_64/editor/Godot_v4.7.2-stable_linux.x86_64
+      - run: npm run gateway:mock > /tmp/fe-gateway.log 2>&1 &
+      - run: downloads/linux-x86_64/editor/Godot_v4.7.2-stable_linux.x86_64 --headless --path godot-project --script res://tests/test_runner.gd
+      - run: downloads/linux-x86_64/editor/Godot_v4.7.2-stable_linux.x86_64 --headless --path godot-project --script res://tests/gateway_integration.gd
+      - run: downloads/linux-x86_64/editor/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --path godot-project --quit-after 240
+
+  godot-project-parse:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            artifact: macos-universal
+          - os: windows-latest
+            artifact: windows-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node tools/download-godot.mjs ${{ matrix.artifact }}
+      - if: runner.os == 'macOS'
+        run: |
+          python3 -m zipfile -e downloads/macos-universal/Godot_v4.7.2-stable_macos.universal.zip downloads/macos-universal/editor
+          chmod +x downloads/macos-universal/editor/Godot.app/Contents/MacOS/Godot
+          downloads/macos-universal/editor/Godot.app/Contents/MacOS/Godot --headless --path godot-project --script res://tests/test_runner.gd
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m zipfile -e downloads/windows-x86_64/Godot_v4.7.2-stable_win64.exe.zip downloads/windows-x86_64/editor
+          downloads/windows-x86_64/editor/Godot_v4.7.2-stable_win64.exe --headless --path godot-project --script res://tests/test_runner.gd

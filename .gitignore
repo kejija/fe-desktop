@@ -1,0 +1,62 @@
+# Standalone project state
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+node_modules/
+.npm/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+.nyc_output/
+
+# Downloaded tools, packages, and generated test/build output
+/build/
+/dist/
+/downloads/
+/artifacts/
+/tmp/
+/test-results/
+/playwright-report/
+/blob-report/
+/demo/
+
+# Godot editor state and generated Future Engine projections
+*.import
+godot-project/.godot/
+godot-project/.future_engine/
+godot-project/.future_engine_cache/
+godot-project/.future_engine_generated/
+godot-project/export.cfg
+
+# Historical local Godot build products left behind by the retired fork.
+# The active branch never packages or compiles these paths.
+/bin/
+/core/
+/doc/
+/drivers/
+/editor/
+/main/
+/misc/
+/modules/
+/platform/
+/scene/
+/servers/
+/thirdparty/
+/tests/
+*.gen.cpp
+*.gen.h
+.sconf_temp/
+.scons_cache/
+.scons_*
+.sconsign*
+compile_commands.json

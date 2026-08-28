@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "design_id": "demo-drive",
+    "name": "Modular servo drive",
+    "description": "Deterministic multi-domain System Design graph fixture",
+    "draft_revision_number": 3,
+    "updated_at": "2026-08-27T12:00:00.000Z"
+  },
+  "draft": {
+    "revision_number": 3,
+    "design": {
+      "schema_version": "future-engine.system-design.v2",
+      "design_id": "demo-drive",
+      "name": "Modular servo drive",
+      "description": "A nested servo drive with mechanical, electrical, and signal relationships.",
+      "assemblies": [
+        { "assembly_id": "root", "name": "Servo workstation", "parent_assembly_id": null },
+        { "assembly_id": "drive", "name": "Drive module", "parent_assembly_id": "root" }
+      ],
+      "component_instances": [
+        {
+          "instance_id": "controller",
+          "name": "Motion controller",
+          "parent_assembly_id": "root",
+          "component_ref": { "id": "component-motion-controller" },
+          "release": { "release_id": "release-controller-2", "item_key": "component/motion-controller", "kind": "component", "version": "2.4.0", "package_digest": "sha256:1010101010101010101010101010101010101010101010101010101010101010" },
+          "transform": { "translation_m": [-0.18, 0.0, 0.10], "rotation_wxyz": [1, 0, 0, 0] },
+          "configuration": { "preset": "servo", "parameter_overrides": [{ "parameter_id": "bus_voltage", "value": 48 }], "parameter_formulas": [] }
+        },
+        {
+          "instance_id": "motor",
+          "name": "BLDC motor",
+          "parent_assembly_id": "drive",
+          "component_ref": { "id": "component-bldc" },
+          "release": { "release_id": "release-bldc-3", "item_key": "component/bldc-motor", "kind": "component", "version": "3.1.0", "package_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111" },
+          "transform": { "translation_m": [0, 0, 0.08], "rotation_wxyz": [1, 0, 0, 0] },
+          "configuration": { "preset": "high-torque", "parameter_overrides": [], "parameter_formulas": [] }
+        },
+        {
+          "instance_id": "shaft",
+          "name": "Output shaft",
+          "parent_assembly_id": "drive",
+          "component_ref": { "id": "component-shaft" },
+          "release": { "release_id": "release-shaft-1", "item_key": "component/round-shaft", "kind": "component", "version": "1.2.0", "package_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222" },
+          "transform": { "translation_m": [0, 0, 0.22], "rotation_wxyz": [1, 0, 0, 0] },
+          "configuration": { "preset": "12mm", "parameter_overrides": [], "parameter_formulas": [] }
+        },
+        {
+          "instance_id": "encoder",
+          "name": "Absolute encoder",
+          "parent_assembly_id": "drive",
+          "component_ref": { "id": "component-encoder" },
+          "release": { "release_id": "release-encoder-5", "item_key": "component/absolute-encoder", "kind": "component", "version": "5.0.1", "package_digest": "sha256:3030303030303030303030303030303030303030303030303030303030303030" },
+          "transform": { "translation_m": [0.07, 0, 0.08], "rotation_wxyz": [1, 0, 0, 0] },
+          "configuration": { "preset": "single-turn", "parameter_overrides": [], "parameter_formulas": [] }
+        },
+        {
+          "instance_id": "plate",
+          "name": "Base plate",
+          "parent_assembly_id": "root",
+          "component_ref": { "id": "component-base-plate" },
+          "release": { "release_id": "release-plate-1", "item_key": "component/base-plate", "kind": "component", "version": "1.0.0", "package_digest": "sha256:4040404040404040404040404040404040404040404040404040404040404040" },
+          "transform": { "translation_m": [0, 0, 0], "rotation_wxyz": [1, 0, 0, 0] },
+          "configuration": { "preset": "compact", "parameter_overrides": [], "parameter_formulas": [] }
+        },
+        {
+          "instance_id": "bolt-1",
+          "name": "Generated M4 fastener",
+          "parent_assembly_id": "drive",
+          "component_ref": { "id": "component-fastener-m4" },
+          "release": { "release_id": "release-fastener-1", "item_key": "component/fastener-m4", "kind": "component", "version": "1.0.0", "package_digest": "sha256:5050505050505050505050505050505050505050505050505050505050505050" },
+          "transform": { "translation_m": [0.03, 0.02, 0.01], "rotation_wxyz": [1, 0, 0, 0] },
+          "configuration": { "preset": "default", "parameter_overrides": [], "parameter_formulas": [] },
+          "generated": { "owner_connection_id": "plate-mount", "role": "fastener" }
+        }
+      ],
+      "connections": [
+        { "connection_id": "power-link", "kind": "electrical", "endpoint_a": { "instance_id": "controller", "interface_id": "motor-power" }, "endpoint_b": { "instance_id": "motor", "interface_id": "power-in" } },
+        { "connection_id": "signal-link", "kind": "signal", "endpoint_a": { "instance_id": "encoder", "interface_id": "position-out" }, "endpoint_b": { "instance_id": "controller", "interface_id": "feedback-in" } },
+        { "connection_id": "motor-shaft", "kind": "mechanical", "endpoint_a": { "instance_id": "motor", "interface_id": "shaft-output" }, "endpoint_b": { "instance_id": "shaft", "interface_id": "drive-input" }, "resolved_joint_id": "shaft-joint" },
+        { "connection_id": "bearing-fit", "kind": "mechanical", "endpoint_a": { "instance_id": "motor", "interface_id": "front-bearing" }, "endpoint_b": { "instance_id": "shaft", "interface_id": "bearing-seat" } },
+        { "connection_id": "plate-mount", "kind": "mechanical", "endpoint_a": { "instance_id": "motor", "interface_id": "frame-mount" }, "endpoint_b": { "instance_id": "plate", "interface_id": "drive-mount" }, "generated_instance_ids": ["bolt-1"] }
+      ],
+      "joints": [
+        { "joint_id": "shaft-joint", "type": "revolute", "parent_instance_id": "motor", "parent_interface_id": "shaft-output", "child_instance_id": "shaft", "child_interface_id": "drive-input", "axis": [0, 0, 1] },
+        { "joint_id": "body-constraint", "type": "fixed", "parent_instance_id": "motor", "child_instance_id": "shaft" }
+      ],
+      "profiles": [
+        { "profile_id": "default", "name": "Default simulation", "duration_s": 5, "timestep_s": 0.002, "gravity_m_s2": [0, 0, -9.80665], "actuator_commands": [], "sensor_measurements": [], "device_bindings": [{ "instance_id": "motor", "device_id": "drive-0" }] },
+        { "profile_id": "commissioning", "name": "Commissioning", "duration_s": 2, "timestep_s": 0.001, "gravity_m_s2": [0, 0, -9.80665], "actuator_commands": [], "sensor_measurements": [], "device_bindings": [] }
+      ],
+      "variables": [],
+      "formula_bindings": [],
+      "extensions": {
+        "node_design_layout": {
+          "component:controller": [70, 140],
+          "assembly:drive": [490, 140],
+          "component:plate": [490, 490],
+          "component:motor": [70, 140],
+          "component:shaft": [490, 140],
+          "component:encoder": [70, 840]
+        }
+      }
+    }
+  },
+  "checkpoints": [
+    { "checkpoint_id": "checkpoint-baseline", "revision_number": 2, "label": "Baseline wiring", "created_at": "2026-08-27T11:45:00.000Z" }
+  ]
+}

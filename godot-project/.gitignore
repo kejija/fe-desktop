@@ -1,0 +1,5 @@
+.godot/
+.future_engine/
+.future_engine_cache/
+.future_engine_generated/
+export.cfg

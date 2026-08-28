@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: Future Engine System Design Presentation API
+  version: 1.0.0
+paths:
+  /v1/designs/{designId}/presentation:
+    get:
+      operationId: getSystemDesignPresentation
+      summary: Resolve one authoritative draft into frontend presentation state
+      parameters:
+        - in: path
+          name: designId
+          required: true
+          schema: { type: string, minLength: 1 }
+        - in: query
+          name: profile_id
+          required: true
+          schema: { type: string, minLength: 1 }
+        - in: header
+          name: If-Match
+          required: true
+          description: Draft revision loaded by the client, optionally quoted.
+          schema: { type: string, pattern: '^\"?[1-9][0-9]*\"?$' }
+      responses:
+        '200':
+          description: Presentation matching the requested draft revision
+          headers:
+            ETag:
+              required: true
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: ./presentation.schema.json
+        '409':
+          description: The draft revision changed before presentation was resolved
+        '422':
+          description: The draft cannot be resolved into a valid presentation
+        '503':
+          description: A pinned release or asset is unavailable
